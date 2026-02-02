@@ -1,9 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import ValentineLanding from "@/pages/ValentineLanding";
-import FeelingsPage from "@/pages/FeelingsPage";
-import PromisesPage from "@/pages/PromisesPage";
-import FinalPage from "@/pages/FinalPage";
+import CelebrationPage from "@/pages/CelebrationPage";
 import NotFound from "@/pages/NotFound";
 import PageTransition from "./PageTransition";
 
@@ -22,26 +20,10 @@ const AnimatedRoutes = () => {
           }
         />
         <Route
-          path="/feelings"
+          path="/celebration"
           element={
             <PageTransition>
-              <FeelingsPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/promises"
-          element={
-            <PageTransition>
-              <PromisesPage />
-            </PageTransition>
-          }
-        />
-        <Route
-          path="/final"
-          element={
-            <PageTransition>
-              <FinalPage />
+              <CelebrationPage />
             </PageTransition>
           }
         />

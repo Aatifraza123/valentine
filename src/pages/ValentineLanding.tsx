@@ -8,8 +8,19 @@ const ValentineLanding = () => {
   const navigate = useNavigate();
   const [noButtonPosition, setNoButtonPosition] = useState({ x: 0, y: 0 });
   const [noAttempts, setNoAttempts] = useState(0);
-  const [yesButtonSize, setYesButtonSize] = useState(1);
+  const [hoverMessage, setHoverMessage] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const hoverMessages = [
+    "Are you sure? 🥺",
+    "Think again... 💕",
+    "Really? But why? 😢",
+    "Please say yes! 🙏",
+    "Don't break my heart! 💔",
+    "Just click Yes! ✨",
+    "You know you want to say yes! 😊",
+    "Come on, say yes! 💖",
+  ];
 
   useEffect(() => {
     // Set page title
@@ -20,20 +31,25 @@ const ValentineLanding = () => {
     if (!containerRef.current) return;
     
     const container = containerRef.current.getBoundingClientRect();
-    const button = 200; // Approximate button width
-    const buttonHeight = 80; // Approximate button height
+    const buttonWidth = 150; // Approximate button width
+    const buttonHeight = 60; // Approximate button height
     
-    // Calculate max positions to keep button within viewport
-    const maxX = (container.width - button) / 2;
-    const maxY = (container.height - buttonHeight) / 2;
+    // Calculate safe boundaries (keep button within screen)
+    const maxX = (container.width / 2) - buttonWidth;
+    const maxY = (container.height / 2) - buttonHeight;
+    const minX = -(container.width / 2) + buttonWidth;
+    const minY = -(container.height / 2) + buttonHeight;
     
-    // Generate random position anywhere on screen
-    const newX = (Math.random() - 0.5) * maxX * 2;
-    const newY = (Math.random() - 0.5) * maxY * 2;
+    // Generate random position within safe boundaries
+    const newX = Math.random() * (maxX - minX) + minX;
+    const newY = Math.random() * (maxY - minY) + minY;
     
     setNoButtonPosition({ x: newX, y: newY });
     setNoAttempts(prev => prev + 1);
-    setYesButtonSize(prev => Math.min(prev + 0.1, 1.5));
+    
+    // Show random hover message (stays until next hover)
+    const randomMessage = hoverMessages[Math.floor(Math.random() * hoverMessages.length)];
+    setHoverMessage(randomMessage);
   };
 
   const handleYes = () => {
@@ -153,30 +169,28 @@ const ValentineLanding = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up animation-delay-600">
-          {/* Yes Button - Gets bigger */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-fade-in-up animation-delay-600 relative">
+          {/* Yes Button - Fixed size */}
           <Button
             size="lg"
             onClick={handleYes}
             className="group bg-primary hover:bg-primary/90 text-primary-foreground px-12 py-7 text-xl font-display
                        shadow-romantic hover:shadow-lg transition-all duration-500 rounded-full
-                       hover:scale-110 glow-button"
-            style={{
-              transform: `scale(${yesButtonSize})`,
-            }}
+                       hover:scale-110 glow-button z-10"
           >
             <Heart className="w-5 h-5 mr-2 group-hover:animate-heartbeat fill-current" />
             Yes! 💕
           </Button>
 
-          {/* No Button - Moves away */}
+          {/* No Button - Moves away within screen */}
           <Button
             size="lg"
             variant="outline"
             onMouseEnter={moveNoButton}
             onClick={moveNoButton}
+            onTouchStart={moveNoButton}
             className="px-12 py-7 text-xl font-display rounded-full border-2 border-primary/30 
-                       text-foreground/70 hover:text-foreground transition-all duration-300"
+                       text-foreground/70 hover:text-foreground transition-all duration-300 z-10"
             style={{
               transform: `translate(${noButtonPosition.x}px, ${noButtonPosition.y}px)`,
               transition: 'transform 0.3s ease-out',
@@ -185,6 +199,15 @@ const ValentineLanding = () => {
             No 🙈
           </Button>
         </div>
+        
+        {/* Hover Message - Better positioned */}
+        {hoverMessage && (
+          <div className="mt-8 animate-fade-in-up">
+            <p className="font-display text-2xl text-primary font-bold italic bg-white/95 px-8 py-4 rounded-2xl shadow-romantic border-2 border-primary/20">
+              {hoverMessage}
+            </p>
+          </div>
+        )}
 
         {/* Playful messages after attempts */}
         {noAttempts > 0 && noAttempts <= 2 && (
@@ -195,11 +218,6 @@ const ValentineLanding = () => {
         {noAttempts > 2 && noAttempts <= 4 && (
           <p className="font-body text-sm text-primary mt-8 animate-fade-in-up italic font-medium">
             I think the universe wants you to say yes... 💕
-          </p>
-        )}
-        {noAttempts > 4 && (
-          <p className="font-body text-sm text-primary mt-8 animate-fade-in-up italic font-medium">
-            The Yes button is getting bigger because it knows you want to click it! 😊✨
           </p>
         )}
       </div>      
